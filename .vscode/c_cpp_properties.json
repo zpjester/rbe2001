@@ -3,8 +3,7 @@
         {
             "name": "Win32",
             "includePath": [
-                "${workspaceFolder}/**",
-                "H:/GitHub/RBE2001/**"
+                "${workspaceFolder}/**"
             ],
             "defines": [
                 "_DEBUG",
