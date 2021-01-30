@@ -2,7 +2,7 @@
 #include <Arduino.h>
 #include <driveBase.cpp>
 #include <Gyro.h>
-#include <IRDecoder.h>
+#include <IRdecoder.h>
 
 class Controller{
     public:
