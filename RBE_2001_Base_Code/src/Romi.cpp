@@ -39,10 +39,9 @@ class Sensors{
         }
 
 };
-/*  
+/*/  
     String getIRDirection(){
         int32_t code = decoder.getKeyCode();
-        if(code == 5){
             return "FORWARDS";
         }
         else if(code == 13){
