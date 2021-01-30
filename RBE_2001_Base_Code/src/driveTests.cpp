@@ -1,4 +1,4 @@
-//Template code
+/*//Template code
 #include <Romi.cpp>
 Romi robot = Romi();
 
@@ -17,3 +17,4 @@ void loop(){
 
 }
 
+*/

@@ -2,7 +2,7 @@
 #include <Arduino.h>
 #include <driveBase.cpp>
 #include <Gyro.h>
-#include <IRdecoder.h>
+// #include <IRdecoder.h>
 
 class Controller{
     public:
@@ -10,17 +10,17 @@ class Controller{
     Romi32U4ButtonB buttonB;
     Romi32U4ButtonC buttonC;
     Gyro gyro;
-    IRDecoder irSensor;
+    //IRDecoder irSensor;
     Controller(){
         buttonA = Romi32U4ButtonA();
         buttonB = Romi32U4ButtonB();
         buttonC = Romi32U4ButtonC();
         gyro = Gyro();
-        irSensor = IRDecoder();
+        // irSensor = IRDecoder();
         //irSensor.init();
     }
     String getIRDirection(){
-        return "";
+        return "IR Machine Broke";
     };
 };
 
