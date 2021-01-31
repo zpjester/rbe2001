@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <Romi32U4.h>
+#include <Timer.h>
 class driveBase{
     private:
         double gearRatio;
@@ -8,6 +9,7 @@ class driveBase{
         double wheelBase;
         Romi32U4Motors motors;
         Romi32U4Encoders encoders;
+        int missedCommands;
     public:
         //constructor
         driveBase(){
@@ -41,32 +43,45 @@ class driveBase{
         int rightThrottle;
         int leftDir;
         int rightDir;
-        int maxThrottle = 300;
+        int maxThrottle = 200;
+        
+
             if(direction.equals("FORWARDS")){
                  leftDir = 1;
                 rightDir = 1;
+                missedCommands = 0;
             }
             else if(direction.equals("BACKWARDS")){
                  leftDir = -1;
                 rightDir = -1;
+                missedCommands = 0;
             }
             else if(direction.equals("LEFT")){
                  leftDir = -1;
                 rightDir = 1;
+                missedCommands = 0;
             }
             else if(direction.equals("RIGHT")){
                  leftDir = 1;
                 rightDir = -1;
+                missedCommands = 0;
             }
-            else{
+            else if(direction.equals("STOP")){
+                leftDir = 0;
+                rightDir = 0;                
+            }
+            else if(missedCommands > 200){
                 leftDir = 0;
                 rightDir = 0;
-                Serial.println("Error, invalid direction");
+                missedCommands = 0;
+            }
+            else{
+                missedCommands++;
             }
             leftThrottle = leftDir * maxThrottle;
             rightThrottle = rightDir * maxThrottle;
             motors.setEfforts(leftThrottle, rightThrottle);
-        }
+        };
         
 
 };

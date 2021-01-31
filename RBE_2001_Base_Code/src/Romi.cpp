@@ -32,16 +32,15 @@ class Sensors{
     IRDecoder decoder;
     public:
     Sensors(void) : decoder(14) {
-
     }
     void sensorsInit(void) {
         decoder.init();
         }
-
+/*/
 };
 /*/  
-    String getIRDirection(){
-        int32_t code = decoder.getKeyCode();
+    String getIRDirectionFromCode(int32_t code){
+        if(code == 5){
             return "FORWARDS";
         }
         else if(code == 13){
@@ -53,15 +52,27 @@ class Sensors{
         else if(code == 10){
             return "RIGHT";
         }
+        else if(code == 9){
+            return "STOP";
+        }
         else{
-            return "NO DIRECTION";
+            return "NO INPUT";
         }
     };
+    String getIRDirection(){
+        int32_t code = decoder.getKeyCode();
+        return getIRDirectionFromCode(code);
+    }
     
     
 };
 
 /**/
+
+
+
+
+
 class Romi{
     public:
     driveBase drive;
