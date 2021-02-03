@@ -44,50 +44,6 @@ class driveBase{
             return (getWheelAngle(side)) * PI / 180 * (wheelDiam / 2);
         }
         
-        void earlyDrive(String direction, double speed){//direction = FORWARDS, BACKWARDS, LEFT, RIGHT; 0 <= speed <= 1
-        int leftThrottle;
-        int rightThrottle;
-        int leftDir;
-        int rightDir;
-        int maxThrottle = 200;
-        
-
-            if(direction.equals("FORWARDS")){
-                 leftDir = 1;
-                rightDir = 1;
-                missedCommands = 0;
-            }
-            else if(direction.equals("BACKWARDS")){
-                 leftDir = -1;
-                rightDir = -1;
-                missedCommands = 0;
-            }
-            else if(direction.equals("LEFT")){
-                 leftDir = -1;
-                rightDir = 1;
-                missedCommands = 0;
-            }
-            else if(direction.equals("RIGHT")){
-                 leftDir = 1;
-                rightDir = -1;
-                missedCommands = 0;
-            }
-            else if(direction.equals("STOP")){
-                leftDir = 0;
-                rightDir = 0;                
-            }
-            else if(missedCommands > 200){
-                leftDir = 0;
-                rightDir = 0;
-                missedCommands = 0;
-            }
-            else{
-                missedCommands++;
-            }
-            leftThrottle = leftDir * maxThrottle;
-            rightThrottle = rightDir * maxThrottle;
-            motors.setEfforts(leftThrottle, rightThrottle);
-        };
         void tankDrive(double leftThrottle, double rightThrottle){
             int maxThrottle = 300;
             motors.setEfforts(leftThrottle * maxThrottle, rightThrottle * maxThrottle);

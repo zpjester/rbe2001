@@ -7,16 +7,6 @@ IRDecoder decoder(14);
 void setup(){
 //Put your setup code here, to run once.
 Serial.begin(9600);
-robot.motherBoard.buttonA.waitForPress();
-delay(1000);
-robot.drive.driveDistance(10);
-delay(500);
- robot.drive.turnAngle(180);
-delay(500);
-// robot.drive.driveDistance(10);
-delay(500);
-// robot.drive.turnAngle(180);
-Serial.println("Drive complete");
 robot.robotFastInit();
 }
 void loop(){
@@ -33,6 +23,7 @@ int32_t keyCode = decoder.getKeyCode();
 
 
 /**/
+
 delay(1);
 };
 
