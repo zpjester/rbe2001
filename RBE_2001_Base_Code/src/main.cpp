@@ -2,27 +2,40 @@
 #include <Romi.cpp>
 
 Romi robot = Romi();
-IRDecoder decoder(14);
-
+// IRDecoder decoder(14);
+enum driveType{initialize, driving, turning};
+int driveMode;
 void setup(){
 //Put your setup code here, to run once.
 Serial.begin(9600);
-robot.robotFastInit();
+// robot.robotFastInit();
+driveMode = initialize;
 }
 void loop(){
 //Put your loop code here, to run repeatedly.
-int32_t keyCode = decoder.getKeyCode();
+switch (driveMode){
+    case initialize:
+    robot.drive.driveDist(6, 6, 0.375);
+    driveMode = driving;
+    break;
+    case driving:
+    if(robot.drive.runDrive()){
+        robot.drive.stopDrive();
+        delay(500);
+        robot.drive.turnAngle(90, .375);
+        driveMode = turning;
+    };
+    break;
+    case turning:
+    if(robot.drive.runDrive()){
+        robot.drive.stopDrive();
+        delay(500);
+        robot.drive.driveDist(6, 6, .375);
+        driveMode = driving;
+    };
+    
+}
 
-//Arcade drive using IR remote
-//
-    String currCommand = robot.sensors.getIRDirectionFromCode(keyCode, true);
-    if(keyCode >= 0){Serial.println(currCommand);}
-    robot.drive.directionalDrive(currCommand, 1);
-/*/
-
-
-
-/**/
 
 delay(1);
 };

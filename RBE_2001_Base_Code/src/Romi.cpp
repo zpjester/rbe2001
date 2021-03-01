@@ -1,6 +1,6 @@
 #include <Romi32U4.h>
 #include <Arduino.h>
-#include <driveBase.cpp>
+#include <driveBaseV2.h>
 #include <Gyro.h>
 #include "IRdecoder.h"
 
@@ -98,12 +98,12 @@ class Sensors{
 
 class Romi{
     public:
-    driveBase drive;
+    driveBaseV2 drive;
     Controller motherBoard;
     Sensors sensors;
 
     Romi(){
-        drive = driveBase();
+        drive = driveBaseV2();
         motherBoard = Controller();
     };
     void robotInit(){

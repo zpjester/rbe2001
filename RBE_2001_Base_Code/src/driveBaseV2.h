@@ -1,30 +1,29 @@
 #include <Romi32U4.h>
 #include "PIDController.cpp"
 #include <Timer.h>
+#include <utils.h>
 class driveBaseV2{
     private:
-    bool active;
-    enum modes{stopped, direct, distance};
-    modes driveMode;
-    double baseWidth;
-    double wheelDiam;
-    int gearRatio;//between encoder and wheel
-    int encoderRes;//Encoder counts per revolution
-    double L_Target_Dist;
-    double R_Target_Dist;
-    double L_Position;
-    double R_Position;
-    int max_Throttle;
+        
     Romi32U4Motors driveMotors;
     Romi32U4Encoders driveEncoders;
     PIDController steerPID();
     Timer driveTimer();
+    bool handleDistDrive();
+    bool handlePIDDrive();
     public:
-    void driveBaseV2::tankDrive(double L_Throttle, double R_Throttle);
-    void driveBaseV2::arcadeDrive(double yAxis, double xAxis);
-    void runDrive();
-    void driveWheelsDist(double left_dist, double right_dist);
-    void driveDist(double dist);
-    void turnAngle(double angle);
+    float getLeftDist();
+    float getRightDist();
+    void resetEncoders();
+    bool runDrive();
+    void stopDrive();
+    void pauseDrive();
+    void resumeDrive();
+    void tankDrive(double L_Throttle, double R_Throttle);
+    void arcadeDrive(double yAxis, double xAxis);
+    void driveDist(double left_dist, double right_dist, float throttle);
+    void driveDistPID(double left_dist, double right_dist, float throttle);
+    void turnAngle(double angle, float throttle);
+    void turnAnglePID(double angle, float throttle);
     driveBaseV2();
 };
