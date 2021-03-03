@@ -3,6 +3,7 @@
 #include <driveBaseV2.h>
 #include <Gyro.h>
 #include "IRdecoder.h"
+#include <sensors.h>
 
 class Controller{
     public:
@@ -27,68 +28,7 @@ class Controller{
     }
 };
 
-class Sensors{
-    public:
-    IRDecoder decoder;
-    public:
-    Sensors(void) : decoder(14) {
-    }
-    void sensorsInit(void) {
-        decoder.init();
-        }
-/*/
-};
-/*/  
-    String getIRDirectionFromCode(int32_t code, bool compass){
-        if(!compass){
-            switch(code){
-                case 5:
-                return "FORWARDS";
-                case 13:
-                return "BACKWARDS";
-                case 8:
-                return "LEFT";
-                case 10:
-                return "RIGHT";
-                case 9:
-                return "STOP";
-                default:
-                return "NO INPUT";
-            }
-        }
-        else{
-          switch(code){
-                case 5:
-                return "NORTH";
-                case 13:
-                return "SOUTH";
-                case 8:
-                return "WEST";
-                case 10:
-                return "EAST";
-                case 6:
-                return "NORTHEAST";
-                case 14:
-                return "SOUTHEAST";
-                case 12:
-                return "SOUTHWEST";
-                case 4:
-                return "NORTHWEST";
-                case 9:
-                return "STOP";
-                default:
-                return "NO INPUT";
-            }  
-        }
-        
-    };
-    String getIRDirection(bool compass){
-        int32_t code = decoder.getKeyCode();
-        return getIRDirectionFromCode(code, compass);
-    }
-    
-    
-};
+
 
 /**/
 
@@ -100,7 +40,7 @@ class Romi{
     public:
     driveBaseV2 drive;
     Controller motherBoard;
-    Sensors sensors;
+    sensors sensors;
 
     Romi(){
         drive = driveBaseV2();
