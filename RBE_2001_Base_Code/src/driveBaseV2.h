@@ -4,13 +4,14 @@
 #include <utils.h>
 class driveBaseV2{
     private:
-        
+    PIDController steerPID;
     Romi32U4Motors driveMotors;
     Romi32U4Encoders driveEncoders;
-    PIDController steerPID();
+    PIDController steerPID;
     Timer driveTimer();
     bool handleDistDrive();
     bool handlePIDDrive();
+    void startPIDDrive(float l_dist, float r_dist, float throttle);
     public:
     float getLeftDist();
     float getRightDist();
@@ -19,11 +20,11 @@ class driveBaseV2{
     void stopDrive();
     void pauseDrive();
     void resumeDrive();
-    void tankDrive(double L_Throttle, double R_Throttle);
-    void arcadeDrive(double yAxis, double xAxis);
-    void driveDist(double left_dist, double right_dist, float throttle);
-    void driveDistPID(double left_dist, double right_dist, float throttle);
-    void turnAngle(double angle, float throttle);
-    void turnAnglePID(double angle, float throttle);
+    void tankDrive(float L_Throttle, float R_Throttle);
+    void arcadeDrive(float yAxis, float xAxis);
+    void driveDist(float left_dist, float right_dist, float throttle);
+    void driveDistPID(float left_dist, float right_dist, float throttle);
+    void turnAngle(float angle, float throttle);
+    void turnAnglePID(float angle, float throttle);
     driveBaseV2();
 };

@@ -21,31 +21,31 @@ extern Romi32U4Motors driveMotors;
 extern Romi32U4Encoders driveEncoders;
 extern PIDController steerPID;
 extern Timer driveTimer;
-float getLeftDist(){
+float driveBaseV2::getLeftDist(){
     float counts = driveEncoders.getCountsLeft();
     float dist = counts / (encoderRes * gearRatio) * PI * wheelDiam;
     return dist;
 }
-float getRightDist(){
+float driveBaseV2::getRightDist(){
     float counts = driveEncoders.getCountsRight();
     float dist = counts / (encoderRes * gearRatio) * PI * wheelDiam;
     return dist; 
 }
-void resetEncoders(){
+void driveBaseV2::resetEncoders(){
     driveEncoders.getCountsAndResetLeft();
     driveEncoders.getCountsAndResetRight();
 }
 
 
-void tankDrive(float L_Throttle, float R_Throttle){
+void driveBaseV2::tankDrive(float L_Throttle, float R_Throttle){
     driveMode = direct;
     driveMotors.setEfforts(L_Throttle * max_Throttle, R_Throttle * max_Throttle);
 }
-void arcadeDrive(double throttle, double steering){//Throttle / steering from -1 to 1, mix is similar to axes on an analog stick. Math based on WPILib for FRC
+void driveBaseV2::arcadeDrive(float throttle, float steering){//Throttle / steering from -1 to 1, mix is similar to axes on an analog stick. Math based on WPILib for FRC
             //Quadrant-based system
             int quadrant;
-            double rightThrottle;
-            double leftThrottle;
+            float rightThrottle;
+            float leftThrottle;
             if(throttle >= 0){
                 if(steering >= 0){
                     quadrant = 1;
@@ -64,7 +64,7 @@ void arcadeDrive(double throttle, double steering){//Throttle / steering from -1
             }
 
             
-            double maxInput;
+            float maxInput;
             if(abs(throttle) > abs(steering)){
                 maxInput = throttle;
             }
@@ -95,15 +95,15 @@ void arcadeDrive(double throttle, double steering){//Throttle / steering from -1
                 break;                
             }
             
-            tankDrive(leftThrottle, rightThrottle);
+            driveBaseV2::tankDrive(leftThrottle, rightThrottle);
         };
 
-void driveDist(float left_dist, float right_dist, float throttle){
+void driveBaseV2::driveDist(float left_dist, float right_dist, float throttle){
     L_Target_Dist = left_dist;
     R_Target_Dist = right_dist;
     L_Position = 0;
     R_Position = 0;
-    resetEncoders();
+    driveBaseV2::resetEncoders();
     float avg_dist = (abs(left_dist) + abs(right_dist)) / 2;
     l_throttle = left_dist / avg_dist * throttle;
     r_throttle = right_dist / avg_dist * throttle;
@@ -112,16 +112,16 @@ void driveDist(float left_dist, float right_dist, float throttle){
         l_throttle /= maxThrottle;
         r_throttle /= maxThrottle;
     }
-    tankDrive(l_throttle, r_throttle);
+    driveBaseV2::tankDrive(l_throttle, r_throttle);
     driveMode = distance;
 }
-void turnAngle(float angle, float throttle){
+void driveBaseV2::turnAngle(float angle, float throttle){
     float dist = angle * PI / 180 * baseWidth / 2;
     L_Target_Dist = -dist;
     R_Target_Dist = dist;
     L_Position = 0;
     R_Position = 0;
-    resetEncoders();
+    driveBaseV2::resetEncoders();
     l_throttle = throttle * sign(L_Target_Dist);
     r_throttle = throttle * sign(R_Target_Dist);
     float maxThrottle = max(l_throttle, r_throttle);
@@ -129,24 +129,24 @@ void turnAngle(float angle, float throttle){
         l_throttle /= maxThrottle;
         r_throttle /= maxThrottle;
     }
-    tankDrive(l_throttle, r_throttle);
+    driveBaseV2::tankDrive(l_throttle, r_throttle);
     driveMode = distance;
 }
 
 
 
-void stopDrive(){
-    tankDrive(0, 0);
+void driveBaseV2::stopDrive(){
+    driveBaseV2::tankDrive(0, 0);
     driveMode = stopped;
 }
 
-bool handleDistDrive(){
-    L_Position = getLeftDist();
-    R_Position = getRightDist();
+bool driveBaseV2::handleDistDrive(){
+    L_Position = driveBaseV2::getLeftDist();
+    R_Position = driveBaseV2::getRightDist();
     bool L_Complete = (abs(L_Target_Dist - L_Position) <= distTolerance);
     bool R_Complete = (abs(R_Target_Dist - R_Position) <= distTolerance);
     if(L_Complete && R_Complete){
-        stopDrive();
+        driveBaseV2::stopDrive();
         return true;
     }
     else{
@@ -156,17 +156,17 @@ bool handleDistDrive(){
         if(R_Complete){
             r_throttle = 0;
         }
-        tankDrive(l_throttle, r_throttle);
+        driveBaseV2::tankDrive(l_throttle, r_throttle);
         driveMode = distance;
         return false;
     }
 }
-bool handlePIDDrive(){
+bool driveBaseV2::handlePIDDrive(){
     return false;
 }
 
 
-bool runDrive(){
+bool driveBaseV2::runDrive(){
     switch (driveMode){
         case stopped:
         return true;
@@ -189,12 +189,19 @@ bool runDrive(){
     }
 }
 
-void pauseDrive(){
+void driveBaseV2::pauseDrive(){
     prevMode = driveMode;
-    tankDrive(0, 0);
+    driveBaseV2::tankDrive(0, 0);
     driveMode = paused;
 }
-void resumeDrive(){
-    tankDrive(l_throttle, r_throttle);
+void driveBaseV2::resumeDrive(){
+    driveBaseV2::tankDrive(l_throttle, r_throttle);
     driveMode = prevMode;
+}
+driveBaseV2::driveBaseV2(){
+    steerPID.setPID(0, 0, 0);
+}
+
+void driveBaseV2::startPIDDrive(float l_dist, float r_dist, float throttle){
+    
 }

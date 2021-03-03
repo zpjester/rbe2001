@@ -20,6 +20,16 @@ class PIDController{
         iVal = I;
         dVal = D;
     }
+    PIDController(){
+        pVal = 0;
+        iVal = 0;
+        dVal = 0;
+    }
+    void setPID(double P, double I, double D){
+        pVal = P;
+        iVal = I;
+        dVal = D;
+    }
     void init(double currValue, double targetValue){
         target = targetValue;
         actual = currValue;
