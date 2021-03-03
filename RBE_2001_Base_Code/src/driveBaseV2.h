@@ -7,7 +7,7 @@ class driveBaseV2{
     PIDController steerPID;
     Romi32U4Motors driveMotors;
     Romi32U4Encoders driveEncoders;
-    PIDController steerPID;
+    // PIDController steerPID;
     Timer driveTimer();
     bool handleDistDrive();
     bool handlePIDDrive();

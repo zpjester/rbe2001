@@ -13,7 +13,7 @@
     float L_Position = 0;
     float R_Position = 0;
     float max_Throttle = 300;
-    float distTolerance = .125;
+    float distTolerance = .0625;
     float l_throttle = 0;
     float r_throttle = 0;
 
@@ -141,10 +141,14 @@ void driveBaseV2::stopDrive(){
 }
 
 bool driveBaseV2::handleDistDrive(){
+    const float startScaleDist = 0.5;
+    const float endThrottleFraction = 0.25;
     L_Position = driveBaseV2::getLeftDist();
     R_Position = driveBaseV2::getRightDist();
-    bool L_Complete = (abs(L_Target_Dist - L_Position) <= distTolerance);
-    bool R_Complete = (abs(R_Target_Dist - R_Position) <= distTolerance);
+    float L_Remaining = abs(L_Target_Dist - L_Position);
+    float R_Remaining = abs(R_Target_Dist - R_Position);
+    bool L_Complete = (L_Remaining <= distTolerance);
+    bool R_Complete = (R_Remaining <= distTolerance);
     if(L_Complete && R_Complete){
         driveBaseV2::stopDrive();
         return true;
@@ -156,7 +160,16 @@ bool driveBaseV2::handleDistDrive(){
         if(R_Complete){
             r_throttle = 0;
         }
-        driveBaseV2::tankDrive(l_throttle, r_throttle);
+        float l_adj_throttle = l_throttle;
+        float r_adj_throttle = r_throttle;
+        if(L_Remaining < startScaleDist){
+            l_adj_throttle = l_throttle * ((L_Remaining / startScaleDist) + ((startScaleDist - L_Remaining) * endThrottleFraction));
+        }
+        if(R_Remaining < startScaleDist){
+            r_adj_throttle = r_throttle * ((R_Remaining / startScaleDist) + ((startScaleDist - R_Remaining) * endThrottleFraction));
+        }
+
+        driveBaseV2::tankDrive(l_adj_throttle, r_adj_throttle);
         driveMode = distance;
         return false;
     }
@@ -199,7 +212,7 @@ void driveBaseV2::resumeDrive(){
     driveMode = prevMode;
 }
 driveBaseV2::driveBaseV2(){
-    steerPID.setPID(0, 0, 0);
+    // steerPID.setPID(0, 0, 0);
 }
 
 void driveBaseV2::startPIDDrive(float l_dist, float r_dist, float throttle){
