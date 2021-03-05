@@ -141,7 +141,7 @@ void driveBaseV2::stopDrive(){
 }
 
 bool driveBaseV2::handleDistDrive(){
-    const float startScaleDist = 0.5;
+    const float startScaleDist = 1.0;//inches
     const float endThrottleFraction = 0.25;
     L_Position = driveBaseV2::getLeftDist();
     R_Position = driveBaseV2::getRightDist();

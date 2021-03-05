@@ -1,11 +1,11 @@
 
-#include "sensors.h";
-
+#include "sensors.h"
+/*
 extern IRDecoder decoder;
-void sensors::sensorsInit(){
+void RomiSensors::sensorsInit(){
             decoder.init();
 }
-String sensors::getIRDirectionFromCode(int32_t code, bool compass){
+String RomiSensors::getIRDirectionFromCode(int32_t code, bool compass){
         if(!compass){
             switch(code){
                 case 5:
@@ -48,4 +48,4 @@ String sensors::getIRDirectionFromCode(int32_t code, bool compass){
         }
         
     };
-    
+    */

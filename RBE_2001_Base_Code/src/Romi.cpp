@@ -40,7 +40,7 @@ class Romi{
     public:
     driveBaseV2 drive;
     Controller motherBoard;
-    sensors sensors;
+    RomiSensors sensors;
 
     Romi(){
         drive = driveBaseV2();

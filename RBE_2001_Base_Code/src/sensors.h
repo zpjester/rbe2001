@@ -1,16 +1,15 @@
 #include <Arduino.h>
-#include "IRdecoder.h"
-class sensors{
+// #include "IRdecoder.h"
+class RomiSensors{
+    
     public:
-    IRDecoder decoder;
-    public:
-    sensors(void) : decoder(14) {
-    }
+    // IRDecoder(void) : decoder(14) {
+    // }
     void sensorsInit(void);
 /*/
 };
 /*/  
     String getIRDirectionFromCode(int32_t code, bool compass);
     String getIRDirection(bool compass);   
-    sensors();  
+    // RomiSensors();  
 };
