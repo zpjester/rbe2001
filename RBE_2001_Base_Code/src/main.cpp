@@ -1,7 +1,8 @@
 //
 #include <Romi.cpp>
-
+#include <blueMotor.h>
 Romi robot = Romi();
+blueMotor armMotor = blueMotor();
 // IRDecoder decoder(14);
 enum driveType{initialize, driving, turning};
 int driveState;
@@ -13,31 +14,12 @@ driveState = initialize;
 }
 void loop(){
 //Put your loop code here, to run repeatedly.
-switch (driveState){
-    case initialize:
-    robot.drive.driveDist(6, 6, 0.375);
-    driveState = driving;
-    break;
-    case driving:
-    if(robot.drive.runDrive()){
-        robot.drive.stopDrive();
-        delay(500);
-        robot.drive.turnAngle(90, .25);
-        driveState = turning;
-    };
-    break;
-    case turning:
-    if(robot.drive.runDrive()){
-        robot.drive.stopDrive();
-        delay(500);
-        robot.drive.driveDist(6, 6, .375);
-        driveState = driving;
-    };
-    
-}
+armMotor.setEffort(1);
+delay(500);
+armMotor.setEffort(-1);
+delay(500);
 
 
-delay(1);
 };
 
 
