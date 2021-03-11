@@ -5,13 +5,15 @@ blueMotor liftMotor;
 
 float targetHeight;
 
-const float gearRatio;
-const float pivotHeight;//inches, height of powered crank
-const float crankLength;//inches
+const float torqueRatio =  30;
+const float pivotHeight = 4.8;//inches, height of powered crank
+const float crankLength = 3;//inches
 
 public:
 bool runArm();//Go to target position, return true if finished
-void goToHeight(float height);//Set target position
-
+void goToAngle(float angle);//Set target position
+float getAngle();
+void setup();
+void reset();
 
 };

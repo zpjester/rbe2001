@@ -1,4 +1,4 @@
-#include "blueMotor.h"
+#include <blueMotor.h>
 
 long oldValue;
 long newValue;
@@ -11,6 +11,7 @@ char encoderArray[4][4] = {
     {1, 0, X, -1},
     {-1, X, 0, 1},
     {X, 1, -1, 0}};
+
 
 
 void blueMotor::setEffort(int effort, bool clockwise){
@@ -36,9 +37,12 @@ void blueMotor::setEffort(float effort){
 }
 
 void blueMotor::moveTo(long position){
-
+    blueMotor::targetPosition = position;
 }
-
+void blueMotor::moveToAngle(float angle){
+    long position = angle / (2 * PI) * EncoderRatio;
+    blueMotor::moveTo(position);
+}
 long blueMotor::getPosition(){
     return count;
 }
@@ -54,7 +58,7 @@ void blueMotor::EncoderISR(){
         errorCount++;
     }
     else{
-        count += value;
+        count -= value;
     }
     oldValue = newValue;
 }
@@ -81,7 +85,7 @@ void blueMotor::setup(){
 
 float blueMotor::getRadians(){
     float position = getPosition();
-    return (position / EncoderRatio * 2 * 3.14159);
+    return (position / EncoderRatio * 2 * PI);
 }
 
 float blueMotor::getVelocity(){
@@ -94,4 +98,15 @@ float blueMotor::getVelocity(){
     previousTime = currentTime;             //Reset time
     // return timeDifference;
     return(positionDifference / timeDifference) * 1000 * 60;
+}
+bool blueMotor::runMotor(){
+    if(abs(targetPosition - getPosition()) < tolerance){
+        blueMotor::setEffort(0);
+        return true;
+    }
+    else{
+        blueMotor::setEffort(300 * sign(targetPosition - getPosition()));
+        Serial.println(targetPosition - getPosition());
+        return false;
+    }
 }

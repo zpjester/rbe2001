@@ -1,9 +1,10 @@
 #include <Arduino.h>
+#include <utils.h>
 #pragma once
 class blueMotor{
     private:
     float targetAngle;//radians
-    
+    float targetPosition;//counts
 
     void setEffort(int effort, bool clockwise);
         static void EncoderISR();
@@ -28,7 +29,7 @@ class blueMotor{
     float getVelocity();
     void moveTo(long position);
     void moveToAngle(float angle);//Set target angle (rad)
-    bool runArm();//Move towards target angle, return true if finished
+    bool runMotor();//Move towards target angle, return true if finished
 
-    blueMotor();
+    // blueMotor();
 };
