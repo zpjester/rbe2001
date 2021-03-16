@@ -100,8 +100,13 @@ class Romi{
     public:
     driveBase drive;
     Controller motherBoard;
+<<<<<<< Updated upstream
     Sensors sensors;
 
+=======
+    RomiSensors sensors;
+    
+>>>>>>> Stashed changes
     Romi(){
         drive = driveBase();
         motherBoard = Controller();
