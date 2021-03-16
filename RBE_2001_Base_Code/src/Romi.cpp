@@ -3,6 +3,7 @@
 #include <driveBase.cpp>
 #include <Gyro.h>
 #include "IRdecoder.h"
+#include <fourBar.h>
 
 class Controller{
     public:
@@ -100,13 +101,13 @@ class Romi{
     public:
     driveBase drive;
     Controller motherBoard;
-<<<<<<< Updated upstream
+    fourBar lift;
     Sensors sensors;
 
-=======
-    RomiSensors sensors;
+
+    // RomiSensors sensors;
     
->>>>>>> Stashed changes
+
     Romi(){
         drive = driveBase();
         motherBoard = Controller();
@@ -114,11 +115,11 @@ class Romi{
     void robotInit(){
         //main robot init here;
         motherBoard.controllerInit();
-        sensors.sensorsInit();
+        // sensors.sensorsInit();
     }
     void robotFastInit(){
         //main robot init here
         motherBoard.controllerFastInit();
-        sensors.sensorsInit();
+        // sensors.sensorsInit();
     }
 };

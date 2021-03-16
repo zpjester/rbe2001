@@ -1,4 +1,4 @@
-#include <Arduino.h>
+#/*include <Arduino.h>
 #include <Romi32U4.h>
 // #include <Timer.h> //unused
 #include "PIDController.cpp"
@@ -150,12 +150,14 @@ class driveBase{
             
             
         }
+        /*
         void driveWheelsDistance(double leftDistance, double rightDistance){//CANNOT turn with 1 wheel stationary. PID needs tuning
             if(leftDistance == 0 || rightDistance == 0){
                 Serial.println("Error: driveWheelsDistance() requires both distances to be nonzero");
             }
             else{
-                PIDController steerPID(.05, 0, 0);
+                PIDController steerPID();
+                steerPID.setPID(0.05, 0, 0)
                 double avgDistance = (abs(leftDistance) + abs(rightDistance)) / 2;
                 double standardThrottle = 0.5;
                 double leftCompletion = 0;
@@ -217,3 +219,4 @@ class driveBase{
         
 
 };
+*/

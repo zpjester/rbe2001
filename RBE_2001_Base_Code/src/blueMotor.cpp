@@ -43,9 +43,10 @@ void blueMotor::setEffort(float effort){
 
 void blueMotor::moveTo(long position){
     blueMotor::targetPosition = position;
+    blueMotor::armPID.init(getPosition(), position);
 }
 void blueMotor::moveToAngle(float angle){
-    long position = angle / (2 * PI) * EncoderRatio;
+    long position = angle / 360 * EncoderRatio;
     blueMotor::moveTo(position);
 }
 long blueMotor::getPosition(){
@@ -86,6 +87,8 @@ void blueMotor::setup(){
     Serial.begin(9600);
     attachInterrupt(digitalPinToInterrupt(encPin1), EncoderISR, CHANGE);
     attachInterrupt(digitalPinToInterrupt(encPin2), EncoderISR, CHANGE);
+    //PID Setup
+    blueMotor::armPID.setPID(.01, 0, 0);
 }
 
 float blueMotor::getRadians(){
@@ -110,8 +113,17 @@ bool blueMotor::runMotor(){
         return true;
     }
     else{
-        blueMotor::setEffort(300 * sign(targetPosition - getPosition()));
-        Serial.println(targetPosition - getPosition());
+        armPID.runPID(getPosition(), targetPosition);
+        float throttleFrac = armPID.getPID();
+        if(abs(throttleFrac) > 1){
+            throttleFrac = sign(throttleFrac);
+        }
+        float throttle = throttleFrac * 400;
+        setEffortDBand(throttle);
+
+
+
+
         return false;
     }
 }

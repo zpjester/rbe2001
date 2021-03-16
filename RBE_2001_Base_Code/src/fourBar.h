@@ -1,3 +1,4 @@
+#pragma once
 #include <blueMotor.h>
 class fourBar{
 private:
@@ -5,9 +6,9 @@ private:
 
 float targetHeight;
 
-const float torqueRatio =  30;
-const float pivotHeight = 4.8;//inches, height of powered crank
-const float crankLength = 3;//inches
+float torqueRatio =  30;
+float pivotHeight = 4.8;//inches, height of powered crank
+float crankLength = 3;//inches
 
 public:
 blueMotor liftMotor;

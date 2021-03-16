@@ -1,11 +1,13 @@
 #include <Arduino.h>
 #include <utils.h>
+#include <PIDController.h>
+
 #pragma once
 class blueMotor{
     private:
     float targetAngle;//radians
     float targetPosition;//counts
-
+    PIDController armPID;
     void setEffort(int effort, bool clockwise);
         static void EncoderISR();
         const int tolerance = 3;
