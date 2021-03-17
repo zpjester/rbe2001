@@ -23,8 +23,8 @@ class blueMotor{
         int upDBand = 194;
         int downDBand = 227;
 
-        float PID_P = .00025;
-        float PID_I = .00000000;
+        float PID_P = .1;
+        float PID_I = -.000001;
         float PID_D = .0001;
 
         

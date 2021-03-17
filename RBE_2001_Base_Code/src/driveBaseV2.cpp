@@ -26,7 +26,7 @@ void driveBaseV2::resetEncoders(){
 
 
 void driveBaseV2::tankDrive(float L_Throttle, float R_Throttle){
-    driveMotors.setEfforts(-L_Throttle * max_Throttle, -R_Throttle * max_Throttle);
+    driveMotors.setEfforts(-L_Throttle * max_Throttle * trim, -R_Throttle * max_Throttle / trim);
 }
 void driveBaseV2::arcadeDrive(float throttle, float steering){//Throttle / steering from -1 to 1, mix is similar to axes on an analog stick. Math based on WPILib for FRC
             //Quadrant-based system
@@ -123,7 +123,7 @@ void driveBaseV2::turnAngle(float angle, float throttle){
 void driveBaseV2::driveUltrasonic(float targetCM){
     L_Target_Dist = targetCM;
     driveMode = proximity;
-    proxPID.setPID(.125, -0.0001, 0.25);
+    proxPID.setPID(.05, -0.00025, 0.25);
     proxPID.init(US.getDistanceCM(), targetCM);
 }
 
@@ -138,8 +138,9 @@ bool driveBaseV2::handleUltrasonicDrive(){
         if(abs(throttle) > 1){
             throttle = sign(throttle);
         }
-        throttle *= .375;
-        tankDrive(throttle * trim, throttle / trim);
+        throttle *= .25;
+        tankDrive(throttle, throttle);
+        driveMode = proximity;
     }
 }
 void driveBaseV2::stopDrive(){
@@ -203,6 +204,9 @@ void driveBaseV2::runDrive(){
             driveMode = stopped;
         }
         break;
+        case paused:
+        tankDrive(0, 0);
+        break;
         default:
         driveMode = stopped;
         break;
@@ -212,7 +216,7 @@ void driveBaseV2::runDrive(){
 void driveBaseV2::pauseDrive(){
     prevMode = driveMode;
     driveBaseV2::tankDrive(0, 0);
-    driveMode = stopped;
+    driveMode = paused;
 }
 void driveBaseV2::resumeDrive(){
     driveBaseV2::tankDrive(l_throttle, r_throttle);

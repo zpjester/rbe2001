@@ -7,7 +7,7 @@ class gripper{
     const float minAnglePot = 0;//Potentiometer reading at 0 deg
     const float maxAnglePot = 1024;//Potentiometer reading at 180 deg
 
-    const float openAngle = 0;//Open position
+    const float openAngle = 5;//Open position
     const float closedAngle = 100;//Closed position
     const int minSignal = 900;
     const int maxSignal = 2100;

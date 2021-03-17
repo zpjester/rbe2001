@@ -3,7 +3,7 @@
 #include <Timer.h>
 #include <utils.h>
 
-enum driveModes{stopped, encoders, proximity};
+enum driveModes{stopped, encoders, proximity, paused};
 class driveBaseV2{
     private:
     PIDController steerPID;
@@ -32,7 +32,7 @@ class driveBaseV2{
     float l_throttle = 0;
     float r_throttle = 0;
 
-    float trim = 1.0;
+    float trim = 1.02;
 
 
     float getLeftDist();

@@ -87,7 +87,7 @@ void blueMotor::setup(){
 
     pinMode(4, OUTPUT);
     pinMode(11, OUTPUT);
-    Serial.begin(9600);
+    // Serial.begin(9600);
     attachInterrupt(digitalPinToInterrupt(encPin1), EncoderISR, CHANGE);
     attachInterrupt(digitalPinToInterrupt(encPin2), EncoderISR, CHANGE);
 
@@ -118,7 +118,7 @@ bool blueMotor::runMotor(){
     }
     else{
         liftPID.runPID(getPosition(), targetPosition);
-        Serial.println(targetPosition - getPosition());
+        // Serial.println(targetPosition - getPosition());
         float fracThr = -liftPID.getPID();
         if(abs(fracThr) > 1){
             fracThr = sign(fracThr);

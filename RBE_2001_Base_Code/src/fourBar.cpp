@@ -34,3 +34,8 @@ void fourBar::goDown(){
     // Serial.println(fourBar::liftMotor.getPosition());
     delay(1000);
 }
+
+void fourBar::pause(){
+    fourBar::liftMotor.setEffort(0);
+}
+void fourBar::resume(){}

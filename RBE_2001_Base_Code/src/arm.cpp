@@ -1,6 +1,11 @@
 #include <arm.h>
 void Arm::runArm(){
+    if(state == movingGripper && armTimer.isExpired()){
+        state = idle;
+    }
+
     if(state == idle){}
+    else if(state == armPaused){}
     else if(state == movingArm){
         bool complete = lift.runArm();
         if(complete){
@@ -14,15 +19,17 @@ void Arm::setAngle(float angle){
 }
 void Arm::setGripperState(bool open){
     if(open){
-        gripper.open();
+        Gripper.open();
     }   
     else{
-        gripper.close();
+        Gripper.close();
     }
+    armTimer.reset(750);
+    state = movingGripper;
 }
 void Arm::pause(){
     prevState = state;
-    state = idle;
+    state = armPaused;
     lift.pause();   
 }
 void Arm::resume(){
