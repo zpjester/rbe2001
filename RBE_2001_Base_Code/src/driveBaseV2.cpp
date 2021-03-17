@@ -116,6 +116,8 @@ void driveBaseV2::turnAngle(float angle, float throttle){
         l_throttle /= maxThrottle;
         r_throttle /= maxThrottle;
     }
+    l_throttle *= 0.5;
+    r_throttle *= 0.5;
     driveBaseV2::tankDrive(l_throttle, r_throttle);
     driveMode = encoders;
 }
@@ -123,7 +125,7 @@ void driveBaseV2::turnAngle(float angle, float throttle){
 void driveBaseV2::driveUltrasonic(float targetCM){
     L_Target_Dist = targetCM;
     driveMode = proximity;
-    proxPID.setPID(.05, -0.00025, 0.25);
+    proxPID.setPID(.025, -0.00025, 0.25);
     proxPID.init(US.getDistanceCM(), targetCM);
 }
 
