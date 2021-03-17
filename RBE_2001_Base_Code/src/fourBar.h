@@ -1,7 +1,7 @@
 #include <blueMotor.h>
 class fourBar{
 private:
-blueMotor liftMotor;
+
 
 float targetHeight;
 
@@ -10,10 +10,15 @@ const float pivotHeight = 4.8;//inches, height of powered crank
 const float crankLength = 3;//inches
 
 public:
+blueMotor liftMotor;
 bool runArm();//Go to target position, return true if finished
 void goToAngle(float angle);//Set target position
 float getAngle();
 void setup();
 void reset();
+void goDown();
+void pause();
+void resume();
+
 
 };

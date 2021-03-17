@@ -1,30 +1,31 @@
-int position = 0;
-Servo32U4 servo;
+#include <gripper.h>
+ extern Servo32U4 servo;
+
 bool Open = true;
 
-void Gripper::init(){
+void gripper::init(){
     servo.Init();
     servo.Attach();
+
+    openVal = openAngle / totalAngle * (maxSignal - minSignal) + minSignal;
+    closedVal = closedAngle / totalAngle * (maxSignal - minSignal) + minSignal;
+    
     servo.Write(openVal);
 }
 
-void Gripper::open(){
+void gripper::open(){
     servo.Write(openVal);
     Open = true;
     Serial.println(Open);
 }
 
-void Gripper::close(){
+void gripper::close(){
     servo.Write(closedVal);
     Open = false;
     Serial.println(Open);
 }
 
-int Gripper::getPosition(){
-    return position;
-}
+// int gripper::getAngle(){
+//     return position;
+// }
 
-void Gripper::toggle(){
-    if(Open) close();
-    else open();
-}

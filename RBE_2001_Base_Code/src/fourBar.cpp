@@ -17,3 +17,20 @@ void fourBar::reset(){
 float fourBar::getAngle(){
     return fourBar::liftMotor.getRadians() / torqueRatio;
 }
+void fourBar::goDown(){
+    // Serial.println("Resetting Arm");
+    pinMode(1, INPUT_PULLUP);
+    fourBar::liftMotor.setEffort(-300);
+    while(digitalRead(1) == 1){
+        delay(1);
+        // Serial.println(digitalRead(1));
+    }
+    fourBar::liftMotor.setEffort(300);
+    delay(40);
+    
+    fourBar::liftMotor.setEffort(0);
+
+    fourBar::liftMotor.reset();
+    // Serial.println(fourBar::liftMotor.getPosition());
+    delay(1000);
+}

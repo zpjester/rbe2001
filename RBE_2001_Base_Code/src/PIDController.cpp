@@ -1,36 +1,11 @@
-class PIDController{
-    private:
-    double pVal;
-    double iVal;
-    double dVal;
-    double target;
-    double actual;
-    double output;
-    int timesRun;
-    double pError;
-    double iError;
-    double dError;
-    double pFactor;
-    double iFactor;
-    double dFactor;
-    double prevError;
-    public:
-    PIDController(double P, double I, double D){
+    #include <PIDController.h>
+    
+    void PIDController::setPID(double P, double I, double D){
         pVal = P;
         iVal = I;
         dVal = D;
     }
-    PIDController(){
-        pVal = 0;
-        iVal = 0;
-        dVal = 0;
-    }
-    void setPID(double P, double I, double D){
-        pVal = P;
-        iVal = I;
-        dVal = D;
-    }
-    void init(double currValue, double targetValue){
+    void PIDController::init(double currValue, double targetValue){
         target = targetValue;
         actual = currValue;
         output = 0;
@@ -40,7 +15,7 @@ class PIDController{
         dError = 0;
         timesRun = 0;
     }
-    void runPID(double currValue, double targetValue){
+    void PIDController::runPID(double currValue, double targetValue){
         timesRun++;
         target = targetValue;
         actual = currValue;
@@ -49,18 +24,15 @@ class PIDController{
         pFactor = pError * pVal;
 
         //Integral
-        //yes this is technically an incorrect implementation
         iError += pError;
-        iFactor = iError / timesRun * iVal;
+        iFactor = -iError * iVal;
 
         //Differential
-        //Seriously you should probably stop reading now if you are a math major
         dError = pError - prevError;
         prevError = pError;
         dFactor = dError * dVal;
         output = pFactor + iFactor + dFactor;
     }
-    double getPID(){
+    double PIDController::getPID(){
         return output;
     }
-};

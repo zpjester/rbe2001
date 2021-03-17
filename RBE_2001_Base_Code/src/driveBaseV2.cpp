@@ -1,22 +1,10 @@
-#include "driveBaseV2.h"
-
-    int active = false;
-    enum modes{stopped, direct, distance, PID, paused};
-    int driveMode = stopped;
-    int prevMode = stopped;
-    const float baseWidth = 5.625;
+#include <driveBaseV2.h>
+#include <Ultrasonic.h>
+    extern Ultrasonic US;
+const float baseWidth = 5.625;
     const float wheelDiam = 2.7375;
     const int gearRatio = 120;
     const int encoderRes = 12;
-    float L_Target_Dist = 0;
-    float R_Target_Dist = 0;
-    float L_Position = 0;
-    float R_Position = 0;
-    float max_Throttle = 300;
-    float distTolerance = .0625;
-    float l_throttle = 0;
-    float r_throttle = 0;
-
 extern Romi32U4Motors driveMotors;
 extern Romi32U4Encoders driveEncoders;
 extern PIDController steerPID;
@@ -24,12 +12,12 @@ extern Timer driveTimer;
 float driveBaseV2::getLeftDist(){
     float counts = driveEncoders.getCountsLeft();
     float dist = counts / (encoderRes * gearRatio) * PI * wheelDiam;
-    return dist;
+    return -dist;
 }
 float driveBaseV2::getRightDist(){
     float counts = driveEncoders.getCountsRight();
     float dist = counts / (encoderRes * gearRatio) * PI * wheelDiam;
-    return dist; 
+    return -dist; 
 }
 void driveBaseV2::resetEncoders(){
     driveEncoders.getCountsAndResetLeft();
@@ -38,8 +26,7 @@ void driveBaseV2::resetEncoders(){
 
 
 void driveBaseV2::tankDrive(float L_Throttle, float R_Throttle){
-    driveMode = direct;
-    driveMotors.setEfforts(L_Throttle * max_Throttle, R_Throttle * max_Throttle);
+    driveMotors.setEfforts(-L_Throttle * max_Throttle, -R_Throttle * max_Throttle);
 }
 void driveBaseV2::arcadeDrive(float throttle, float steering){//Throttle / steering from -1 to 1, mix is similar to axes on an analog stick. Math based on WPILib for FRC
             //Quadrant-based system
@@ -113,7 +100,7 @@ void driveBaseV2::driveDist(float left_dist, float right_dist, float throttle){
         r_throttle /= maxThrottle;
     }
     driveBaseV2::tankDrive(l_throttle, r_throttle);
-    driveMode = distance;
+    driveMode = encoders;
 }
 void driveBaseV2::turnAngle(float angle, float throttle){
     float dist = angle * PI / 180 * baseWidth / 2;
@@ -130,11 +117,31 @@ void driveBaseV2::turnAngle(float angle, float throttle){
         r_throttle /= maxThrottle;
     }
     driveBaseV2::tankDrive(l_throttle, r_throttle);
-    driveMode = distance;
+    driveMode = encoders;
+}
+
+void driveBaseV2::driveUltrasonic(float targetCM){
+    L_Target_Dist = targetCM;
+    driveMode = proximity;
+    proxPID.setPID(.125, -0.0001, 0.25);
+    proxPID.init(US.getDistanceCM(), targetCM);
 }
 
 
-
+bool driveBaseV2::handleUltrasonicDrive(){
+    if(abs(US.getDistanceCM() - L_Target_Dist) < .5){
+        stopDrive();
+    }
+    else{
+        proxPID.runPID(US.getDistanceCM(), L_Target_Dist);
+        float throttle = proxPID.getPID();
+        if(abs(throttle) > 1){
+            throttle = sign(throttle);
+        }
+        throttle *= .375;
+        tankDrive(throttle * trim, throttle / trim);
+    }
+}
 void driveBaseV2::stopDrive(){
     driveBaseV2::tankDrive(0, 0);
     driveMode = stopped;
@@ -170,7 +177,7 @@ bool driveBaseV2::handleDistDrive(){
         }
 
         driveBaseV2::tankDrive(l_adj_throttle, r_adj_throttle);
-        driveMode = distance;
+        driveMode = encoders;
         return false;
     }
 }
@@ -179,25 +186,25 @@ bool driveBaseV2::handlePIDDrive(){
 }
 
 
-bool driveBaseV2::runDrive(){
+void driveBaseV2::runDrive(){
+    bool complete;
     switch (driveMode){
         case stopped:
-        return true;
         break;
-        case direct:
-        return true;
+        case encoders:
+        complete = handleDistDrive();
+        if(complete){
+            driveMode = stopped;
+        }
         break;
-        case distance:
-        return handleDistDrive();
-        break;
-        case PID:
-        return handlePIDDrive();
-        break;
-        case paused:
-        return true;
+        case proximity:
+        complete = handleUltrasonicDrive();
+        if(complete){
+            driveMode = stopped;
+        }
         break;
         default:
-        return false;
+        driveMode = stopped;
         break;
     }
 }
@@ -205,7 +212,7 @@ bool driveBaseV2::runDrive(){
 void driveBaseV2::pauseDrive(){
     prevMode = driveMode;
     driveBaseV2::tankDrive(0, 0);
-    driveMode = paused;
+    driveMode = stopped;
 }
 void driveBaseV2::resumeDrive(){
     driveBaseV2::tankDrive(l_throttle, r_throttle);

@@ -12,6 +12,11 @@ char encoderArray[4][4] = {
     {-1, X, 0, 1},
     {X, 1, -1, 0}};
 
+int deadBands[3][2] = {
+    {184, 193},//Unloaded up / down
+    {201, 191},//Plastic panel up / down
+    {216, 185} //Aluminum panel up / down
+};
 
 
 void blueMotor::setEffort(int effort, bool clockwise){
@@ -38,6 +43,7 @@ void blueMotor::setEffort(float effort){
 
 void blueMotor::moveTo(long position){
     blueMotor::targetPosition = position;
+    liftPID.init(getPosition(), position);
 }
 void blueMotor::moveToAngle(float angle){
     long position = angle / (2 * PI) * EncoderRatio;
@@ -48,7 +54,10 @@ long blueMotor::getPosition(){
 }
 
 void blueMotor::reset(){
+    noInterrupts();
     count = 0;
+    interrupts();
+    // Serial.println("Resetting arm encoder");
 }
 
 void blueMotor::EncoderISR(){
@@ -81,6 +90,9 @@ void blueMotor::setup(){
     Serial.begin(9600);
     attachInterrupt(digitalPinToInterrupt(encPin1), EncoderISR, CHANGE);
     attachInterrupt(digitalPinToInterrupt(encPin2), EncoderISR, CHANGE);
+
+    //PID Setup
+    liftPID.setPID(blueMotor::PID_P, blueMotor::PID_I, blueMotor::PID_D);
 }
 
 float blueMotor::getRadians(){
@@ -105,8 +117,97 @@ bool blueMotor::runMotor(){
         return true;
     }
     else{
-        blueMotor::setEffort(300 * sign(targetPosition - getPosition()));
+        liftPID.runPID(getPosition(), targetPosition);
         Serial.println(targetPosition - getPosition());
+        float fracThr = -liftPID.getPID();
+        if(abs(fracThr) > 1){
+            fracThr = sign(fracThr);
+        }
+        // Serial.println(fracThr);
+        int throttle = fracThr * 400;
+        setEffortDBand(throttle);
         return false;
     }
+}
+
+
+int blueMotor::checkDeadzone(int dir){
+    blueMotor::reset();
+    int i = 0;
+    bool complete = false;
+    while(!complete){
+        setEffort(i * dir);
+        i++;
+        delay(5);
+        if(abs(count) > 1){
+            complete = true;
+        }
+    }
+    setEffort(0);
+    return i;
+}
+
+void blueMotor::setObject(int obj){
+    object = obj;
+    upDBand = deadBands[obj][0];
+    downDBand = deadBands[obj][1];
+}
+
+int blueMotor::setEffortDBand(float effort){
+    currEffort = effort;
+    if(abs(effort) > 400){
+        effort = sign(effort) * 400;
+    }
+    int dBand;
+    if(effort < 0){
+        dBand = blueMotor::downDBand;
+    }
+    else{
+        dBand = blueMotor::upDBand;
+    }
+    
+    float throttle = effort / 400;
+    float mEffort;
+    if(effort == 0){
+        mEffort = 0;    
+    }
+    else{
+        mEffort = (dBand + abs(throttle) * (400 - dBand)) * sign(effort);
+    }
+    // Serial.println(mEffort);
+    // Serial.println(mEffort);
+    blueMotor::setEffort(mEffort);
+    currEffortCorrected = mEffort;
+    return mEffort;
+}
+
+void blueMotor::testDBands(int obj){
+    const int runs = 25;
+int total = 0;
+for(int i = 0; i < runs; i++){
+    total += blueMotor::checkDeadzone(1);
+    delay(100);
+    Serial.print("Completed: Up Run ");
+    Serial.print(i + 1);
+    Serial.print(" of ");
+    Serial.println(runs);
+}
+total /= runs;
+int upzone = total;
+
+total = 0;
+for(int i = 0; i < runs; i++){
+    total += blueMotor::checkDeadzone(-1);
+    delay(100);
+    Serial.print("Completed: Down Run ");
+    Serial.print(i + 1);
+    Serial.print(" of ");
+    Serial.println(runs);
+}
+total /= runs;
+Serial.print("Up deadzone = ");
+Serial.println(upzone);
+Serial.print("Down deadzone = ");
+Serial.println(total);
+blueMotor::setEffort(0);
 }
