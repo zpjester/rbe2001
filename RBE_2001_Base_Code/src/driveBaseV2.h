@@ -3,7 +3,7 @@
 #include <Timer.h>
 #include <utils.h>
 
-enum driveModes{stopped, encoders, proximity, paused};
+enum driveModes{stopped, encoders, proximity, dTimer, paused};
 class driveBaseV2{
     private:
     PIDController steerPID;
@@ -16,6 +16,10 @@ class driveBaseV2{
     bool handlePIDDrive();
     bool handleUltrasonicDrive();
     void startPIDDrive(float l_dist, float r_dist, float throttle);
+    bool L_Complete;
+    bool R_Complete;
+    long unsigned int endTime;
+    bool handleTimeDrive();
     public:
 
     int active = false;
@@ -49,5 +53,6 @@ class driveBaseV2{
     void turnAngle(float angle, float throttle);
     void turnAnglePID(float angle, float throttle);
     void driveUltrasonic(float targetCM);
+    void driveTime(float throttle, int time);
     driveBaseV2();
 };
