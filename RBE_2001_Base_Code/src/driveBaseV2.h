@@ -28,11 +28,11 @@ class driveBaseV2{
     float L_Position = 0;
     float R_Position = 0;
     float max_Throttle = 300;
-    float distTolerance = .0625;
+    float distTolerance = .0875;
     float l_throttle = 0;
     float r_throttle = 0;
 
-    float trim = 1.02;
+    float trim = 1.0;
 
 
     float getLeftDist();

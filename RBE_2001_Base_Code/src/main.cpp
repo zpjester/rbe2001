@@ -16,13 +16,13 @@ const int pauseCode = 0;
 const int resumeCode = 2;
 const int confirmCode = 9;
 bool robotPaused = false;
-bool awaitConfirm = false;
+bool awaitConfirm = true;
 
 enum mainState{
-    start,
+    initialize, start,
     collectLift, moveToWall, roofGrab, oldLift,//Grab old panel
-    oldToInt, oldTurnToDepot, oldLower, oldMoveToDepot, oldLowerToDepot, oldDrop,//Place old panel
-    newGrab, newToInt, newTurnToRoof, newToPrep, newPlace, newRelease,//grab / place new panel
+    oldToInt, oldTurnToDepot, oldLower, oldMoveToDepot, oldSquareAtDepot, oldDrop,//Place old panel
+    waitForNew, newGrab, newLift, newToInt, newTurnToRoof, newToPrep, newToRoof, newPlace, newRelease,//grab / place new panel
     emptyToInt, traverseTurn1, traverseDriveToStart, traverseTurn2, traverseCross, traverseTurn3, traverseToInt, traverseTurn4,//traverse
     completed};//done
 int robotState;
@@ -30,7 +30,7 @@ int robotState;
 
 void setup(){
 //Put your setup code here, to run once.
-robotState = start;
+robotState = initialize;
 Serial.begin(9600);
 // robot.robotFastInit();
 
@@ -49,11 +49,10 @@ delay(200);
 }
 
 
-bool stageComplete(){
-    
+bool stageComplete(){    
     
     bool completed =  (robot.drive.driveMode == idle) && (arm.state == idle) && !awaitConfirm;
-    Serial.println(awaitConfirm);
+    // Serial.println(awaitConfirm);
     return completed;
 }
 
@@ -64,21 +63,30 @@ void loop(){
 
 //
 switch (robotState){
-    case start:
+    case initialize:
     arm.lift.goDown();
+    robotState++;
+    awaitConfirm = true;
     arm.setGripperState(true);
+    break;
+    case start:
+    
+    
+    if(stageComplete()){
     arm.setAngle(PLACE45);
     
     robotState++;
+    }
+    
     break;
     case collectLift:
     if(stageComplete()){
         float dist;
         if(robotSide == Right){
-            dist = DIST45;
+            dist = DIST45PICKUP;
         }
         else{
-            dist = DIST25;
+            dist = DIST25PICKUP;
         }
         robot.drive.driveUltrasonic(dist);
         robotState++;
@@ -109,7 +117,7 @@ switch (robotState){
     case oldToInt:
     if(stageComplete()){
         float angle = -(robotSide * 2 - 1) * 90;
-        robot.drive.turnAngle(angle, 0.375);  
+        robot.drive.turnAngle(angle, 0.25);  
        robotState++; 
     }
     break;
@@ -122,17 +130,17 @@ switch (robotState){
     case oldLower:
     if(stageComplete()){
         robot.drive.driveUltrasonic(DEPOTDIST);
-        awaitConfirm = true;
        robotState++; 
     }
     break;
     case oldMoveToDepot:
     if(stageComplete()){
-        arm.setAngle(DEPOT);
+        robot.drive.driveDist(0.5, 0.5, 0.5);
+        awaitConfirm = true;
        robotState++; 
     }
     break;
-    case oldLowerToDepot:
+    case oldSquareAtDepot:
     if(stageComplete()){
         arm.setGripperState(true);
        robotState++; 
@@ -140,11 +148,95 @@ switch (robotState){
     break;
     case oldDrop:
         if(stageComplete()){
-        robotState = completed;
-        
+            awaitConfirm = true;
+            delay(250);
+        robotState++;        
     }
     break;
-    
+    case waitForNew:
+    if(stageComplete()){
+        arm.setGripperState(false);
+        robotState++;
+    }
+    break;
+    case newGrab:
+    if(stageComplete()){
+        arm.setAngle(PREP25);
+        robotState++;
+    }
+    break;
+    case newLift:
+    if(stageComplete()){
+        robot.drive.driveUltrasonic(DEPOTINTER);
+        robotState++;
+    }
+    case newToInt:
+    if(stageComplete()){
+        float angle = (robotSide * 2 - 1) * 90;
+        robot.drive.turnAngle(angle, 0.25);
+        robotState++;
+    }
+    break;
+    case newTurnToRoof:
+    if(stageComplete()){
+        float angle;
+        if(robotSide == Right){
+            angle = PREP45;
+        }
+        else{
+            angle = PREP25;
+        }
+        arm.setAngle(angle);
+        robotState++;
+    }
+    break;
+    case newToPrep:
+    if(stageComplete()){
+        float dist;
+        if(robotSide == Right){
+            dist = DIST45;
+        }
+        else{
+            dist = DIST25;
+        }
+        robot.drive.driveUltrasonic(dist);
+        robotState++;
+    }
+    break;
+    case newToRoof:
+        if(stageComplete()){
+            float angle;
+            if(robotSide == Right){
+                angle = PLACE45;
+            }
+            else{
+                angle = PLACE25;
+            }
+            arm.setAngle(angle);
+            awaitConfirm = true;
+            robotState++;
+        }
+    case newPlace:
+        if(stageComplete()){
+            arm.setGripperState(true);
+            robotState++;
+        }
+    break;
+    case newRelease:
+        if(stageComplete()){
+            robot.drive.driveUltrasonic(ROOFINTER);
+            robotState++;
+        }
+    break;
+    case emptyToInt:
+        if(stageComplete()){
+            if(robotSide == Left){
+                robotState == completed;
+            }
+            else{
+                robotState == completed;//Change this to start of traverse when ready
+            }
+        }
 
 
 
@@ -157,7 +249,7 @@ switch (robotState){
 
 int IRCode = decoder.getKeyCode();
 if(IRCode >= 0){
-    Serial.println(IRCode);
+    // Serial.println(IRCode);
 }
 if(IRCode == pauseCode && !robotPaused){
     robotPaused = true;

@@ -116,8 +116,8 @@ void driveBaseV2::turnAngle(float angle, float throttle){
         l_throttle /= maxThrottle;
         r_throttle /= maxThrottle;
     }
-    l_throttle *= 0.5;
-    r_throttle *= 0.5;
+    l_throttle *= 0.75;
+    r_throttle *= 0.75;
     driveBaseV2::tankDrive(l_throttle, r_throttle);
     driveMode = encoders;
 }
@@ -125,7 +125,7 @@ void driveBaseV2::turnAngle(float angle, float throttle){
 void driveBaseV2::driveUltrasonic(float targetCM){
     L_Target_Dist = targetCM;
     driveMode = proximity;
-    proxPID.setPID(.025, -0.00025, 0.25);
+    proxPID.setPID(.0125, -0.000125, 0.25);
     proxPID.init(US.getDistanceCM(), targetCM);
 }
 
@@ -140,7 +140,7 @@ bool driveBaseV2::handleUltrasonicDrive(){
         if(abs(throttle) > 1){
             throttle = sign(throttle);
         }
-        throttle *= .25;
+        throttle *= .75;
         tankDrive(throttle, throttle);
         driveMode = proximity;
     }
@@ -151,8 +151,8 @@ void driveBaseV2::stopDrive(){
 }
 
 bool driveBaseV2::handleDistDrive(){
-    const float startScaleDist = 1.0;//inches
-    const float endThrottleFraction = 0.25;
+    const float startScaleDist = 4;//inches
+    const float endThrottleFraction = 0.375;
     L_Position = driveBaseV2::getLeftDist();
     R_Position = driveBaseV2::getRightDist();
     float L_Remaining = abs(L_Target_Dist - L_Position);
@@ -161,6 +161,7 @@ bool driveBaseV2::handleDistDrive(){
     bool R_Complete = (R_Remaining <= distTolerance);
     if(L_Complete && R_Complete){
         driveBaseV2::stopDrive();
+        Serial.println("Drive Complete");
         return true;
     }
     else{
@@ -181,6 +182,7 @@ bool driveBaseV2::handleDistDrive(){
 
         driveBaseV2::tankDrive(l_adj_throttle, r_adj_throttle);
         driveMode = encoders;
+        Serial.println((L_Remaining + R_Remaining) / 2);
         return false;
     }
 }
